@@ -43,15 +43,15 @@ struct ARSCNViewContainer: UIViewRepresentable {
 
             let node = SCNNode()
 
-            let size = imageAnchor.referenceImage.physicalSize
-            let plane = SCNPlane(width: size.width, height: size.height)
+            let imageSize = imageAnchor.referenceImage.physicalSize
+            let imagePlane = SCNPlane(width: imageSize.width, height: imageSize.height)
 
-            plane.firstMaterial?.diffuse.contents = UIColor.red
+            imagePlane.firstMaterial?.diffuse.contents = UIColor.red
 
-            let planeNode = SCNNode(geometry: plane)
-            planeNode.eulerAngles.x = -.pi / 2
+            let imagePlaneNode = SCNNode(geometry: imagePlane)
+            imagePlaneNode.eulerAngles.x = -.pi / 2
 
-            node.addChildNode(planeNode)
+            node.addChildNode(imagePlaneNode)
 
             return node
         }
