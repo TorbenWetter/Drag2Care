@@ -1,43 +1,59 @@
-//
-//  ContentView.swift
-//  Drag2Care
-//
-//  Created by Torben Wetter on 10.02.23.
-//
-
-import SwiftUI
+import ARKit
 import RealityKit
+import SwiftUI
 
-struct ContentView : View {
+struct ContentView: View {
     var body: some View {
-        ARViewContainer().edgesIgnoringSafeArea(.all)
+        ARSCNViewContainer().edgesIgnoringSafeArea(.all)
     }
 }
 
-struct ARViewContainer: UIViewRepresentable {
-    
-    func makeUIView(context: Context) -> ARView {
-        
-        let arView = ARView(frame: .zero)
-        
-        // Load the "Box" scene from the "Experience" Reality File
-        let boxAnchor = try! Experience.loadBox()
-        
-        // Add the box anchor to the scene
-        arView.scene.anchors.append(boxAnchor)
-        
+struct ARSCNViewContainer: UIViewRepresentable {
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    func makeUIView(context: Context) -> ARSCNView {
+        let arView = ARSCNView(frame: .zero)
+
+        arView.delegate = context.coordinator
+
+        let configuration = ARWorldTrackingConfiguration()
+
+        if let detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "Posters", bundle: Bundle.main) {
+            configuration.detectionImages = detectionImages
+        }
+
+        arView.session.run(configuration)
+
         return arView
-        
     }
-    
-    func updateUIView(_ uiView: ARView, context: Context) {}
-    
-}
 
-#if DEBUG
-struct ContentView_Previews : PreviewProvider {
-    static var previews: some View {
-        ContentView()
+    func updateUIView(_: ARSCNView, context _: Context) {}
+
+    final class Coordinator: NSObject, ARSCNViewDelegate {
+        var parent: ARSCNViewContainer
+
+        init(_ parent: ARSCNViewContainer) {
+            self.parent = parent
+        }
+
+        func renderer(_: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+            guard let imageAnchor = anchor as? ARImageAnchor else { return nil }
+
+            let node = SCNNode()
+
+            let size = imageAnchor.referenceImage.physicalSize
+            let plane = SCNPlane(width: size.width, height: size.height)
+
+            plane.firstMaterial?.diffuse.contents = UIColor.red
+
+            let planeNode = SCNNode(geometry: plane)
+            planeNode.eulerAngles.x = -.pi / 2
+
+            node.addChildNode(planeNode)
+
+            return node
+        }
     }
 }
-#endif

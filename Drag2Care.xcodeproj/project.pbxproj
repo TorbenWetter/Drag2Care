@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		009E79A52996D57B00C792C4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79A42996D57B00C792C4 /* AppDelegate.swift */; };
 		009E79A72996D57B00C792C4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79A62996D57B00C792C4 /* ContentView.swift */; };
-		009E79A92996D57B00C792C4 /* Experience.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = 009E79A82996D57B00C792C4 /* Experience.rcproject */; };
 		009E79AB2996D57D00C792C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 009E79AA2996D57D00C792C4 /* Assets.xcassets */; };
 		009E79AE2996D57D00C792C4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 009E79AD2996D57D00C792C4 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -18,7 +17,6 @@
 		009E79A12996D57B00C792C4 /* Drag2Care.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Drag2Care.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		009E79A42996D57B00C792C4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		009E79A62996D57B00C792C4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		009E79A82996D57B00C792C4 /* Experience.rcproject */ = {isa = PBXFileReference; lastKnownFileType = file.rcproject; path = Experience.rcproject; sourceTree = "<group>"; };
 		009E79AA2996D57D00C792C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		009E79AD2996D57D00C792C4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -55,7 +53,6 @@
 			children = (
 				009E79A42996D57B00C792C4 /* AppDelegate.swift */,
 				009E79A62996D57B00C792C4 /* ContentView.swift */,
-				009E79A82996D57B00C792C4 /* Experience.rcproject */,
 				009E79AA2996D57D00C792C4 /* Assets.xcassets */,
 				009E79AC2996D57D00C792C4 /* Preview Content */,
 			);
@@ -142,7 +139,6 @@
 			files = (
 				009E79A72996D57B00C792C4 /* ContentView.swift in Sources */,
 				009E79A52996D57B00C792C4 /* AppDelegate.swift in Sources */,
-				009E79A92996D57B00C792C4 /* Experience.rcproject in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
