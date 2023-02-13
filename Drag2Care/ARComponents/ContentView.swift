@@ -1,5 +1,3 @@
-import ARKit
-import RealityKit
 import SwiftUI
 
 struct ContentView: View {

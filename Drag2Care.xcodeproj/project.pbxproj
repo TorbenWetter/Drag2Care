@@ -13,6 +13,7 @@
 		009E79AE2996D57D00C792C4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 009E79AD2996D57D00C792C4 /* Preview Assets.xcassets */; };
 		009E79D12999AE2500C792C4 /* CustomARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79D02999AE2500C792C4 /* CustomARView.swift */; };
 		009E79D32999B0B600C792C4 /* CustomARViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */; };
+		009E79D7299AD68E00C792C4 /* CustomARSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79D6299AD68E00C792C4 /* CustomARSessionDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		009E79D02999AE2500C792C4 /* CustomARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARView.swift; sourceTree = "<group>"; };
 		009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARViewRepresentable.swift; sourceTree = "<group>"; };
 		009E79D52999B29900C792C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		009E79D6299AD68E00C792C4 /* CustomARSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARSessionDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 				009E79A62996D57B00C792C4 /* ContentView.swift */,
 				009E79D02999AE2500C792C4 /* CustomARView.swift */,
 				009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */,
+				009E79D6299AD68E00C792C4 /* CustomARSessionDelegate.swift */,
 			);
 			path = ARComponents;
 			sourceTree = "<group>";
@@ -157,6 +160,7 @@
 				009E79D12999AE2500C792C4 /* CustomARView.swift in Sources */,
 				009E79A52996D57B00C792C4 /* AppDelegate.swift in Sources */,
 				009E79D32999B0B600C792C4 /* CustomARViewRepresentable.swift in Sources */,
+				009E79D7299AD68E00C792C4 /* CustomARSessionDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,8 +1,9 @@
 import ARKit
 import RealityKit
-import SwiftUI
 
-class CustomARView: ARView, ARSessionDelegate {
+class CustomARView: ARView {
+    var sessionDelegate: CustomARSessionDelegate?
+
     required init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
     }
@@ -23,26 +24,7 @@ class CustomARView: ARView, ARSessionDelegate {
 
         session.run(configuration)
 
-        session.delegate = self
-    }
-
-    func session(_: ARSession, didAdd anchors: [ARAnchor]) {
-        for anchor in anchors {
-            if let imageAnchor = anchor as? ARImageAnchor {
-                let image = imageAnchor.referenceImage
-
-                let imageAnchorEntity = AnchorEntity(.image(group: "Posters", name: image.name!))
-
-                let imagePlane = MeshResource.generatePlane(width: Float(image.physicalSize.width), height: Float(image.physicalSize.height))
-                let imagePlaneMaterial = SimpleMaterial(color: .red, isMetallic: false)
-                let imagePlaneEntity = ModelEntity(mesh: imagePlane, materials: [imagePlaneMaterial])
-
-                imagePlaneEntity.transform = Transform(pitch: .pi / 2, yaw: .pi, roll: 0)
-
-                imageAnchorEntity.addChild(imagePlaneEntity)
-
-                scene.addAnchor(imageAnchorEntity)
-            }
-        }
+        sessionDelegate = CustomARSessionDelegate(arView: self)
+        session.delegate = sessionDelegate
     }
 }
