@@ -16,19 +16,24 @@ class CustomARView: ARView {
     convenience init() {
         self.init(frame: UIScreen.main.bounds)
 
+        // Create an instance of CustomARSessionDelegate to handle ARSessionDelegate callbacks.
+        sessionDelegate = CustomARSessionDelegate(arView: self)
+        session.delegate = sessionDelegate
+
+        // Configure image and plane tracking using the ARWorldTrackingConfiguration and run the session.
         let configuration = ARWorldTrackingConfiguration()
-
         configuration.planeDetection = [.horizontal]
-
         if let detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "Posters", bundle: Bundle.main) {
             configuration.detectionImages = detectionImages
         }
-
         configuration.environmentTexturing = .automatic
-
         session.run(configuration)
 
-        sessionDelegate = CustomARSessionDelegate(arView: self)
-        session.delegate = sessionDelegate
+        // Add a coaching overlay to the view to prompt the user to find a horizontal plane.
+        let coachingOverlay = ARCoachingOverlayView()
+        coachingOverlay.session = session
+        coachingOverlay.goal = .horizontalPlane
+        coachingOverlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(coachingOverlay)
     }
 }
