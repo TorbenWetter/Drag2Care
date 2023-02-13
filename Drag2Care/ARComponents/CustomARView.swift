@@ -18,9 +18,13 @@ class CustomARView: ARView {
 
         let configuration = ARWorldTrackingConfiguration()
 
+        configuration.planeDetection = [.horizontal]
+
         if let detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "Posters", bundle: Bundle.main) {
             configuration.detectionImages = detectionImages
         }
+
+        configuration.environmentTexturing = .automatic
 
         session.run(configuration)
 

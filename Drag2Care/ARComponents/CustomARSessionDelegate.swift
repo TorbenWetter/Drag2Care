@@ -25,6 +25,18 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
 
                 arView.scene.addAnchor(imageAnchorEntity)
             }
+
+            if let planeAnchor = anchor as? ARPlaneAnchor {
+                let floorSphere = MeshResource.generateSphere(radius: 0.1)
+                let floorSphereMaterial = SimpleMaterial(color: .orange, isMetallic: false)
+                let floorSphereEntity = ModelEntity(mesh: floorSphere, materials: [floorSphereMaterial])
+
+                let planeAnchorEntity = AnchorEntity(anchor: planeAnchor)
+
+                planeAnchorEntity.addChild(floorSphereEntity)
+
+                arView.scene.addAnchor(planeAnchorEntity)
+            }
         }
     }
 }
