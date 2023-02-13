@@ -11,6 +11,8 @@
 		009E79A72996D57B00C792C4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79A62996D57B00C792C4 /* ContentView.swift */; };
 		009E79AB2996D57D00C792C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 009E79AA2996D57D00C792C4 /* Assets.xcassets */; };
 		009E79AE2996D57D00C792C4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 009E79AD2996D57D00C792C4 /* Preview Assets.xcassets */; };
+		009E79D12999AE2500C792C4 /* CustomARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79D02999AE2500C792C4 /* CustomARView.swift */; };
+		009E79D32999B0B600C792C4 /* CustomARViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,9 @@
 		009E79A62996D57B00C792C4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		009E79AA2996D57D00C792C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		009E79AD2996D57D00C792C4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		009E79D02999AE2500C792C4 /* CustomARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARView.swift; sourceTree = "<group>"; };
+		009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARViewRepresentable.swift; sourceTree = "<group>"; };
+		009E79D52999B29900C792C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,8 +56,9 @@
 		009E79A32996D57B00C792C4 /* Drag2Care */ = {
 			isa = PBXGroup;
 			children = (
+				009E79D52999B29900C792C4 /* Info.plist */,
+				009E79D42999B13500C792C4 /* ARComponents */,
 				009E79A42996D57B00C792C4 /* AppDelegate.swift */,
-				009E79A62996D57B00C792C4 /* ContentView.swift */,
 				009E79AA2996D57D00C792C4 /* Assets.xcassets */,
 				009E79AC2996D57D00C792C4 /* Preview Content */,
 			);
@@ -65,6 +71,16 @@
 				009E79AD2996D57D00C792C4 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		009E79D42999B13500C792C4 /* ARComponents */ = {
+			isa = PBXGroup;
+			children = (
+				009E79A62996D57B00C792C4 /* ContentView.swift */,
+				009E79D02999AE2500C792C4 /* CustomARView.swift */,
+				009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */,
+			);
+			path = ARComponents;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +154,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				009E79A72996D57B00C792C4 /* ContentView.swift in Sources */,
+				009E79D12999AE2500C792C4 /* CustomARView.swift in Sources */,
 				009E79A52996D57B00C792C4 /* AppDelegate.swift in Sources */,
+				009E79D32999B0B600C792C4 /* CustomARViewRepresentable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,7 +288,8 @@
 				DEVELOPMENT_TEAM = MPMUC3M969;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_FILE = Drag2Care/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Needed to show AR View";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -301,7 +320,8 @@
 				DEVELOPMENT_TEAM = MPMUC3M969;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_FILE = Drag2Care/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Needed to show AR View";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
