@@ -23,11 +23,10 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
             case let imageAnchor as ARImageAnchor where self.imageAnchor == nil:
                 self.imageAnchor = imageAnchor
 
-                // Add an anchor entity visualizing the poster to the scene.
+                // Create an anchor entity for the image anchor, add model entities as children and add the anchor entity to the scene.
                 guard let imageName = imageAnchor.referenceImage.name else { return }
                 let anchorEntity = AnchorEntity(.image(group: "Posters", name: imageName))
-                let posterEntity = buildPosterEntity(imageAnchor: imageAnchor)
-                anchorEntity.addChild(posterEntity)
+                addEntitiesToImageAnchor(imageAnchor: imageAnchor, anchorEntity: anchorEntity)
                 addAnchorEntity(anchor: imageAnchor, anchorEntity: anchorEntity)
             // In case the anchor is a plane anchor and it is classified as a floor.
             case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
@@ -41,10 +40,9 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
 
                 self.floorAnchor = floorAnchor
 
-                // Add an anchor entity visualizing the floor to the scene.
+                // Create an anchor entity for the floor anchor, add model entities as children and add the anchor entity to the scene.
                 let anchorEntity = AnchorEntity(anchor: floorAnchor)
-                let floorEntity = buildFloorEntity(floorAnchor: floorAnchor)
-                anchorEntity.addChild(floorEntity)
+                addEntitiesToFloorAnchor(floorAnchor: floorAnchor, anchorEntity: anchorEntity)
                 addAnchorEntity(anchor: floorAnchor, anchorEntity: anchorEntity)
             default:
                 continue
@@ -60,19 +58,17 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
                 // Ensure that the old poster entity exists.
                 guard let anchorEntity = anchorEntitiesByAnchor[imageAnchor] else { return }
 
-                // Remove the old poster entity and add a new one to the anchor entity.
-                anchorEntity.children.remove(at: 0)
-                let posterEntity = buildPosterEntity(imageAnchor: imageAnchor)
-                anchorEntity.addChild(posterEntity)
+                // Remove the old model entities and add new ones as children to the anchor entity.
+                anchorEntity.children.removeAll()
+                addEntitiesToImageAnchor(imageAnchor: imageAnchor, anchorEntity: anchorEntity)
             // In case the anchor is a plane anchor and it is the same as the current floor anchor.
             case let floorAnchor as ARPlaneAnchor where floorAnchor == self.floorAnchor:
                 // Ensure that the old floor entity exists.
                 guard let anchorEntity = anchorEntitiesByAnchor[floorAnchor] else { return }
 
-                // Remove the old floor entity and add a new one to the anchor entity.
-                anchorEntity.children.remove(at: 0)
-                let floorEntity = buildFloorEntity(floorAnchor: floorAnchor)
-                anchorEntity.addChild(floorEntity)
+                // Remove the old model entities and add new ones as children to the anchor entity.
+                anchorEntity.children.removeAll()
+                addEntitiesToFloorAnchor(floorAnchor: floorAnchor, anchorEntity: anchorEntity)
             default:
                 continue
             }
@@ -93,6 +89,19 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
                 continue
             }
         }
+    }
+
+    func addEntitiesToImageAnchor(imageAnchor: ARImageAnchor, anchorEntity: AnchorEntity) {
+        let posterEntity = buildPosterEntity(imageAnchor: imageAnchor)
+        anchorEntity.addChild(posterEntity)
+    }
+
+    func addEntitiesToFloorAnchor(floorAnchor: ARPlaneAnchor, anchorEntity: AnchorEntity) {
+        let floorEntity = buildFloorEntity(floorAnchor: floorAnchor)
+        anchorEntity.addChild(floorEntity)
+
+        let cabbageEntity = try! ModelEntity.loadModel(named: "Cabbage")
+        anchorEntity.addChild(cabbageEntity)
     }
 
     func buildPosterEntity(imageAnchor: ARImageAnchor) -> ModelEntity {
