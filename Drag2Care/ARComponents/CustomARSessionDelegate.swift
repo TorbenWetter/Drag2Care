@@ -7,8 +7,10 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
     var imageAnchor: ARImageAnchor?
     var floorAnchor: ARPlaneAnchor?
 
-    var imageAnchorEntity: AnchorEntity?
-    var floorAnchorEntity: AnchorEntity?
+    var anchorEntitiesByAnchor: [ARAnchor: AnchorEntity] = [:]
+
+    let blueMaterial = SimpleMaterial(color: .blue, isMetallic: false)
+    let orangeMaterial = SimpleMaterial(color: .orange, isMetallic: false)
 
     init(arView: ARView) {
         self.arView = arView
@@ -19,35 +21,58 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
             switch anchor {
             // In case the anchor is an image anchor and there is no image anchor yet.
             case let imageAnchor as ARImageAnchor where self.imageAnchor == nil:
-                let image = imageAnchor.referenceImage
-
-                let imageAnchorEntity = AnchorEntity(.image(group: "Posters", name: image.name!))
-
-                // Create a plane entity with the same width and height as the image and add it to the image anchor entity.
-                let planeEntity = generatePlaneEntity(width: Float(image.physicalSize.width), height: Float(image.physicalSize.height), color: .blue)
-                imageAnchorEntity.addChild(planeEntity)
-
-                // Keep track of the image anchor and its corresponding entity, and add the entity to the scene.
                 self.imageAnchor = imageAnchor
-                self.imageAnchorEntity = imageAnchorEntity
-                arView.scene.addAnchor(imageAnchorEntity)
-            // In case the anchor is a floor anchor and there is no floor anchor yet or the new floor anchor is larger than the current floor anchor.
-            case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor && (self.floorAnchor == nil || floorAnchor.planeExtent.width * floorAnchor.planeExtent.height > self.floorAnchor!.planeExtent.width * self.floorAnchor!.planeExtent.height):
+
+                // Add an anchor entity visualizing the poster to the scene.
+                guard let imageName = imageAnchor.referenceImage.name else { return }
+                let anchorEntity = AnchorEntity(.image(group: "Posters", name: imageName))
+                let posterEntity = buildPosterEntity(imageAnchor: imageAnchor)
+                anchorEntity.addChild(posterEntity)
+                addAnchorEntity(anchor: imageAnchor, anchorEntity: anchorEntity)
+            // In case the anchor is a plane anchor and it is classified as a floor.
+            case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
+                // Ensure that there is no floor anchor yet or the newly recognized floor is larger than the current floor.
+                guard self.floorAnchor == nil || floorAnchor.planeExtent.width * floorAnchor.planeExtent.height > self.floorAnchor!.planeExtent.width * self.floorAnchor!.planeExtent.height else { return }
+
+                // If the floor has been recognized before, remove its anchor entity from the scene.
                 if self.floorAnchor != nil {
-                    // If there is already a floor anchor, remove it from the scene.
-                    self.floorAnchorEntity?.removeFromParent()
+                    removeEntityByAnchor(anchor: self.floorAnchor!)
                 }
 
-                let floorAnchorEntity = AnchorEntity(anchor: floorAnchor)
-
-                // Create a sphere entity with a radius of 0.1 and add it to the floor anchor entity.
-                let sphereEntity = generateSphereEntity(radius: 0.1, color: .orange)
-                floorAnchorEntity.addChild(sphereEntity)
-
-                // Keep track of the floor anchor and its corresponding entity, and add the entity to the scene.
                 self.floorAnchor = floorAnchor
-                self.floorAnchorEntity = floorAnchorEntity
-                arView.scene.addAnchor(floorAnchorEntity)
+
+                // Add an anchor entity visualizing the floor to the scene.
+                let anchorEntity = AnchorEntity(anchor: floorAnchor)
+                let floorEntity = buildFloorEntity(floorAnchor: floorAnchor)
+                anchorEntity.addChild(floorEntity)
+                addAnchorEntity(anchor: floorAnchor, anchorEntity: anchorEntity)
+            default:
+                continue
+            }
+        }
+    }
+
+    func session(_: ARSession, didUpdate anchors: [ARAnchor]) {
+        for anchor in anchors {
+            switch anchor {
+            // In case the anchor is an image anchor and it is the same as the current image anchor.
+            case let imageAnchor as ARImageAnchor where imageAnchor == self.imageAnchor:
+                // Ensure that the old poster entity exists.
+                guard let anchorEntity = anchorEntitiesByAnchor[imageAnchor] else { return }
+
+                // Remove the old poster entity and add a new one to the anchor entity.
+                anchorEntity.children.remove(at: 0)
+                let posterEntity = buildPosterEntity(imageAnchor: imageAnchor)
+                anchorEntity.addChild(posterEntity)
+            // In case the anchor is a plane anchor and it is the same as the current floor anchor.
+            case let floorAnchor as ARPlaneAnchor where floorAnchor == self.floorAnchor:
+                // Ensure that the old floor entity exists.
+                guard let anchorEntity = anchorEntitiesByAnchor[floorAnchor] else { return }
+
+                // Remove the old floor entity and add a new one to the anchor entity.
+                anchorEntity.children.remove(at: 0)
+                let floorEntity = buildFloorEntity(floorAnchor: floorAnchor)
+                anchorEntity.addChild(floorEntity)
             default:
                 continue
             }
@@ -59,12 +84,10 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
         for anchor in anchors {
             switch anchor {
             case let imageAnchor as ARImageAnchor where imageAnchor == self.imageAnchor:
-                imageAnchorEntity?.removeFromParent()
-                imageAnchorEntity = nil
+                removeEntityByAnchor(anchor: imageAnchor)
                 self.imageAnchor = nil
             case let floorAnchor as ARPlaneAnchor where floorAnchor == self.floorAnchor:
-                floorAnchorEntity?.removeFromParent()
-                floorAnchorEntity = nil
+                removeEntityByAnchor(anchor: floorAnchor)
                 self.floorAnchor = nil
             default:
                 continue
@@ -72,24 +95,35 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
         }
     }
 
-    func generatePlaneEntity(width: Float, height: Float, color: UIColor) -> ModelEntity {
-        // Create a plane entity with the specified width and height and a material with the specified color.
-        let plane = MeshResource.generatePlane(width: width, height: height)
-        let planeMaterial = SimpleMaterial(color: color, isMetallic: false)
-        let planeEntity = ModelEntity(mesh: plane, materials: [planeMaterial])
+    func buildPosterEntity(imageAnchor: ARImageAnchor) -> ModelEntity {
+        let image = imageAnchor.referenceImage
+        let posterPlane = MeshResource.generatePlane(width: Float(image.physicalSize.width), height: Float(image.physicalSize.height))
 
-        // Rotate the plane so it is perpendicular to the ground.
-        planeEntity.transform = Transform(pitch: .pi / 2, yaw: .pi, roll: 0)
-
-        return planeEntity
+        let posterEntity = ModelEntity(mesh: posterPlane, materials: [blueMaterial])
+        posterEntity.transform = Transform(pitch: .pi / 2, yaw: .pi, roll: 0)
+        return posterEntity
     }
 
-    func generateSphereEntity(radius: Float, color: UIColor) -> ModelEntity {
-        // Create a sphere entity with the specified radius and a material with the specified color.
-        let sphere = MeshResource.generateSphere(radius: radius)
-        let sphereMaterial = SimpleMaterial(color: color, isMetallic: false)
-        let sphereEntity = ModelEntity(mesh: sphere, materials: [sphereMaterial])
+    func buildFloorEntity(floorAnchor: ARPlaneAnchor) -> ModelEntity {
+        let floorGeometry = floorAnchor.geometry
 
-        return sphereEntity
+        var floorDescriptor = MeshDescriptor()
+        floorDescriptor.positions = MeshBuffer(floorGeometry.vertices)
+        floorDescriptor.primitives = .triangles(floorGeometry.triangleIndices.map { UInt32($0) })
+        floorDescriptor.textureCoordinates = MeshBuffer(floorGeometry.textureCoordinates)
+
+        return ModelEntity(mesh: try! .generate(from: [floorDescriptor]), materials: [orangeMaterial])
+    }
+
+    func addAnchorEntity(anchor: ARAnchor, anchorEntity: AnchorEntity) {
+        anchorEntitiesByAnchor[anchor] = anchorEntity
+        arView.scene.addAnchor(anchorEntity)
+    }
+
+    func removeEntityByAnchor(anchor: ARAnchor) {
+        guard let anchorEntity = anchorEntitiesByAnchor[anchor] else { return }
+
+        arView.scene.removeAnchor(anchorEntity)
+        anchorEntitiesByAnchor.removeValue(forKey: anchor)
     }
 }
