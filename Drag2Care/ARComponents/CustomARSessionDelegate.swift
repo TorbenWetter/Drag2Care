@@ -8,6 +8,8 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
     var floorAnchors: [ARPlaneAnchor] = []
     var largestFloorAnchor: ARPlaneAnchor?
 
+    var timeLimitedFloorUpdate: TimeLimitedFunction?
+
     var anchorEntitiesByAnchor: [ARAnchor: AnchorEntity] = [:]
 
     let blueMaterial = SimpleMaterial(color: .blue, isMetallic: false)
@@ -15,6 +17,11 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
 
     init(arView: ARView) {
         self.arView = arView
+        super.init()
+
+        timeLimitedFloorUpdate = TimeLimitedFunction(minTimeInterval: 0.5) { [weak self] in
+            self?.updateLargestFloorAnchor()
+        }
     }
 
     func session(_: ARSession, didAdd anchors: [ARAnchor]) {
@@ -33,7 +40,7 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
             case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
                 floorAnchors.append(floorAnchor)
 
-                // If the new floor anchor is the largest one, update the largest floor anchor and its corresponding anchor entity.
+                // If the new floor anchor is larger or there hasn't been one, update the largest floor anchor and its corresponding anchor entity.
                 if largestFloorAnchor == nil || floorAnchor.planeExtent.width * floorAnchor.planeExtent.height > largestFloorAnchor!.planeExtent.width * largestFloorAnchor!.planeExtent.height {
                     updateLargestFloorAnchor()
                 }
@@ -56,7 +63,10 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
                 addEntitiesToImageAnchor(imageAnchor: imageAnchor, anchorEntity: anchorEntity)
             // In case the anchor is a plane anchor and it is classified as a floor.
             case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
-                updateLargestFloorAnchor()
+                // Update the largest floor anchor and its corresponding anchor entity to notice changes in the plane extents.
+                if let updateLargestFloorAnchor = timeLimitedFloorUpdate {
+                    updateLargestFloorAnchor()
+                }
             default:
                 continue
             }
