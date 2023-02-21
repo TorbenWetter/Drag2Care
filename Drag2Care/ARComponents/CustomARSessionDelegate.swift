@@ -119,8 +119,10 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
         // Create an anchor entity for the largest floor anchor.
         let anchorEntity = AnchorEntity(anchor: largestFloorAnchor)
 
-        // Add the the cabbage entity as child to the anchor entity.
+        // Add the the cabbage entity as child to the anchor entity, install gestures and generate collision shapes.
         let cabbageEntity = buildCabbageEntity()
+        arView.installGestures(.translation, for: cabbageEntity as HasCollision)
+        cabbageEntity.generateCollisionShapes(recursive: true)
         anchorEntity.addChild(cabbageEntity)
 
         // Add the anchor entity to the scene.
