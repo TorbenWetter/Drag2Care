@@ -5,7 +5,8 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
     var arView: ARView
 
     var imageAnchor: ARImageAnchor?
-    var floorAnchor: ARPlaneAnchor?
+    var floorAnchors: [ARPlaneAnchor] = []
+    var largestFloorAnchor: ARPlaneAnchor?
 
     var anchorEntitiesByAnchor: [ARAnchor: AnchorEntity] = [:]
 
@@ -30,20 +31,12 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
                 addAnchorEntity(anchor: imageAnchor, anchorEntity: anchorEntity)
             // In case the anchor is a plane anchor and it is classified as a floor.
             case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
-                // Ensure that there is no floor anchor yet or the newly recognized floor is larger than the current floor.
-                guard self.floorAnchor == nil || floorAnchor.planeExtent.width * floorAnchor.planeExtent.height > self.floorAnchor!.planeExtent.width * self.floorAnchor!.planeExtent.height else { return }
+                floorAnchors.append(floorAnchor)
 
-                // If the floor has been recognized before, remove its anchor entity from the scene.
-                if self.floorAnchor != nil {
-                    removeEntityByAnchor(anchor: self.floorAnchor!)
+                // If the new floor anchor is the largest one, update the largest floor anchor and its corresponding anchor entity.
+                if largestFloorAnchor == nil || floorAnchor.planeExtent.width * floorAnchor.planeExtent.height > largestFloorAnchor!.planeExtent.width * largestFloorAnchor!.planeExtent.height {
+                    updateLargestFloorAnchor()
                 }
-
-                self.floorAnchor = floorAnchor
-
-                // Create an anchor entity for the floor anchor, add model entities as children and add the anchor entity to the scene.
-                let anchorEntity = AnchorEntity(anchor: floorAnchor)
-                addEntitiesToFloorAnchor(floorAnchor: floorAnchor, anchorEntity: anchorEntity)
-                addAnchorEntity(anchor: floorAnchor, anchorEntity: anchorEntity)
             default:
                 continue
             }
@@ -61,14 +54,9 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
                 // Remove the old model entities and add new ones as children to the anchor entity.
                 anchorEntity.children.removeAll()
                 addEntitiesToImageAnchor(imageAnchor: imageAnchor, anchorEntity: anchorEntity)
-            // In case the anchor is a plane anchor and it is the same as the current floor anchor.
-            case let floorAnchor as ARPlaneAnchor where floorAnchor == self.floorAnchor:
-                // Ensure that the old floor entity exists.
-                guard let anchorEntity = anchorEntitiesByAnchor[floorAnchor] else { return }
-
-                // Remove the old model entities and add new ones as children to the anchor entity.
-                anchorEntity.children.removeAll()
-                addEntitiesToFloorAnchor(floorAnchor: floorAnchor, anchorEntity: anchorEntity)
+            // In case the anchor is a plane anchor and it is classified as a floor.
+            case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
+                updateLargestFloorAnchor()
             default:
                 continue
             }
@@ -76,32 +64,61 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
     }
 
     func session(_: ARSession, didRemove anchors: [ARAnchor]) {
-        // When the anchors are removed, remove the corresponding entities from the scene and set the anchor variables to nil.
         for anchor in anchors {
             switch anchor {
+            // In case the anchor is an image anchor and it is the same as the current image anchor.
             case let imageAnchor as ARImageAnchor where imageAnchor == self.imageAnchor:
+                // Remove the anchor entity from the scene and set the image anchor variable to nil.
                 removeEntityByAnchor(anchor: imageAnchor)
                 self.imageAnchor = nil
-            case let floorAnchor as ARPlaneAnchor where floorAnchor == self.floorAnchor:
-                removeEntityByAnchor(anchor: floorAnchor)
-                self.floorAnchor = nil
+            // In case the anchor is a plane anchor and it is classified as a floor.
+            case let floorAnchor as ARPlaneAnchor where floorAnchor.classification == .floor:
+                floorAnchors.removeAll { $0 == floorAnchor }
+
+                // If the floor anchor was the largest one, update the largest floor anchor and its corresponding anchor entity.
+                if floorAnchor == largestFloorAnchor {
+                    updateLargestFloorAnchor()
+                }
             default:
                 continue
             }
         }
     }
 
+    func updateLargestFloorAnchor() {
+        // Retrieve the largest floor anchor by comparing the area of the plane extents.
+        let largestFloorAnchor = floorAnchors.max { anchor1, anchor2 -> Bool in
+            anchor1.planeExtent.width * anchor1.planeExtent.height < anchor2.planeExtent.width * anchor2.planeExtent.height
+        }
+
+        // Ensure that the largest floor anchor has changed.
+        guard largestFloorAnchor != self.largestFloorAnchor else { return }
+
+        // If a floor has been recognized before, remove its anchor entity from the scene.
+        if let currentLargestFloorAnchor = self.largestFloorAnchor {
+            removeEntityByAnchor(anchor: currentLargestFloorAnchor)
+        }
+
+        // Keep track of the new largest floor anchor which can also be nil.
+        self.largestFloorAnchor = largestFloorAnchor
+
+        // Ensure that the largest floor anchor is set.
+        guard let largestFloorAnchor = largestFloorAnchor else { return }
+
+        // Create an anchor entity for the largest floor anchor.
+        let anchorEntity = AnchorEntity(anchor: largestFloorAnchor)
+
+        // Add the the cabbage entity as child to the anchor entity.
+        let cabbageEntity = buildCabbageEntity()
+        anchorEntity.addChild(cabbageEntity)
+
+        // Add the anchor entity to the scene.
+        addAnchorEntity(anchor: largestFloorAnchor, anchorEntity: anchorEntity)
+    }
+
     func addEntitiesToImageAnchor(imageAnchor: ARImageAnchor, anchorEntity: AnchorEntity) {
         let posterEntity = buildPosterEntity(imageAnchor: imageAnchor)
         anchorEntity.addChild(posterEntity)
-    }
-
-    func addEntitiesToFloorAnchor(floorAnchor: ARPlaneAnchor, anchorEntity: AnchorEntity) {
-        let floorEntity = buildFloorEntity(floorAnchor: floorAnchor)
-        anchorEntity.addChild(floorEntity)
-
-        let cabbageEntity = try! ModelEntity.loadModel(named: "Cabbage")
-        anchorEntity.addChild(cabbageEntity)
     }
 
     func buildPosterEntity(imageAnchor: ARImageAnchor) -> ModelEntity {
@@ -113,15 +130,9 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
         return posterEntity
     }
 
-    func buildFloorEntity(floorAnchor: ARPlaneAnchor) -> ModelEntity {
-        let floorGeometry = floorAnchor.geometry
-
-        var floorDescriptor = MeshDescriptor()
-        floorDescriptor.positions = MeshBuffer(floorGeometry.vertices)
-        floorDescriptor.primitives = .triangles(floorGeometry.triangleIndices.map { UInt32($0) })
-        floorDescriptor.textureCoordinates = MeshBuffer(floorGeometry.textureCoordinates)
-
-        return ModelEntity(mesh: try! .generate(from: [floorDescriptor]), materials: [orangeMaterial])
+    func buildCabbageEntity() -> ModelEntity {
+        let cabbageEntity = try! ModelEntity.loadModel(named: "Cabbage")
+        return cabbageEntity
     }
 
     func addAnchorEntity(anchor: ARAnchor, anchorEntity: AnchorEntity) {
