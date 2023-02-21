@@ -16,6 +16,7 @@
 		009E79D7299AD68E00C792C4 /* CustomARSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009E79D6299AD68E00C792C4 /* CustomARSessionDelegate.swift */; };
 		009E79E629A2C30000C792C4 /* Cabbage.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 009E79E529A2C30000C792C4 /* Cabbage.usdz */; };
 		00B88F5929A4FF080065002B /* TimeLimitedFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B88F5829A4FF080065002B /* TimeLimitedFunction.swift */; };
+		00B88F5B29A507360065002B /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B88F5A29A507360065002B /* Model.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		009E79D6299AD68E00C792C4 /* CustomARSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARSessionDelegate.swift; sourceTree = "<group>"; };
 		009E79E529A2C30000C792C4 /* Cabbage.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Cabbage.usdz; sourceTree = "<group>"; };
 		00B88F5829A4FF080065002B /* TimeLimitedFunction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimitedFunction.swift; sourceTree = "<group>"; };
+		00B88F5A29A507360065002B /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +90,7 @@
 				009E79D22999B0B600C792C4 /* CustomARViewRepresentable.swift */,
 				009E79D6299AD68E00C792C4 /* CustomARSessionDelegate.swift */,
 				00B88F5829A4FF080065002B /* TimeLimitedFunction.swift */,
+				00B88F5A29A507360065002B /* Model.swift */,
 			);
 			path = ARComponents;
 			sourceTree = "<group>";
@@ -171,6 +174,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00B88F5B29A507360065002B /* Model.swift in Sources */,
 				009E79A72996D57B00C792C4 /* ContentView.swift in Sources */,
 				00B88F5929A4FF080065002B /* TimeLimitedFunction.swift in Sources */,
 				009E79D12999AE2500C792C4 /* CustomARView.swift in Sources */,

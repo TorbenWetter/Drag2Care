@@ -13,7 +13,8 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
     var anchorEntitiesByAnchor: [ARAnchor: AnchorEntity] = [:]
 
     let blueMaterial = SimpleMaterial(color: .blue, isMetallic: false)
-    let orangeMaterial = SimpleMaterial(color: .orange, isMetallic: false)
+
+    let cabbageModel = Model(named: "Cabbage")
 
     init(arView: ARView) {
         self.arView = arView
@@ -141,8 +142,13 @@ class CustomARSessionDelegate: NSObject, ARSessionDelegate {
     }
 
     func buildCabbageEntity() -> ModelEntity {
-        let cabbageEntity = try! ModelEntity.loadModel(named: "Cabbage")
-        return cabbageEntity
+        if let cabbageEntity = cabbageModel.modelEntity {
+            // If the cabbage model has already been loaded, return a copy of it.
+            return cabbageEntity.clone(recursive: true)
+        } else {
+            // If the cabbage model hasn't been loaded yet, load it synchronously and return the model entity.
+            return try! ModelEntity.loadModel(named: "Cabbage")
+        }
     }
 
     func addAnchorEntity(anchor: ARAnchor, anchorEntity: AnchorEntity) {
